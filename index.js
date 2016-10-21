@@ -1,22 +1,19 @@
 
 module.exports = function (filter) {
-  var value, listeners = []
+  var value = null, listeners = [], oncers = []
   function trigger (_value) {
     value = _value
     var length = listeners.length
     for(var i = 0; i< length && value === _value; i++) {
-      var listener = listeners[i]
+      var listener = listeners[i](value)
       //if we remove a listener, must decrement i also
-      if(listener(value)) listeners.splice(i--, 1)
     }
+    while(oncers.length) oncers.shift()(value)
   }
 
-  function many (ready) {
-    if(value) {
-      if(ready(value))
-        return //don't remove because we didn't add it
-    }
+  function many (ready, immediately) {
     var i = listeners.push(ready) - 1
+    if(value !== null && immediately !== false) ready(value)
     return function () { //manually remove...
       //fast path, will happen if an earlier listener has not been removed.
       if(listeners[i] !== ready)
@@ -30,6 +27,13 @@ module.exports = function (filter) {
     return many
   }
 
+  many.once = function (once, immediately) {
+    if(value !== null && immediately !== false) once(value)
+    else oncers.push(once)
+  }
+
   return many
 }
+
+
 
