@@ -57,30 +57,6 @@ module.exports = function (observable) {
 
   })
 
-  tape('listener returns true to remove', function (t) {
-
-    var o = observable()
-
-    var value = Math.random(),  checked = 0
-
-    o.set(value)
-
-    var rm = o(function (_value) {
-      t.equal(_value, value)
-      checked ++
-      return true
-    })
-
-    t.equal(checked, 1)
-    t.equal(rm, undefined)
-
-    o.set(Math.random())
-    t.equal(checked, 1)
-
-    t.end()
-
-  })
-
   tape('add listener within trigger', function (t) {
     var o = observable()
 
@@ -108,7 +84,6 @@ module.exports = function (observable) {
     var value = Math.random(),  checked = 1, checking = false
 
     function recurse () {
-//      t.equal(checking, false, 'not inside recursion')
       checking = true
       checked ++
       if(checked < 3)
@@ -137,16 +112,40 @@ module.exports = function (observable) {
     t.end()
   })
 
+  tape('once', function (t) {
+    var o = observable()
+    var fired = 0
+    o.once(function (v) {
+      fired ++
+      t.equal(v, 1)
+    })
+
+    o.set(1)
+
+    o.once(function (v) {
+      fired ++
+      t.equal(v, 2)
+    }, false)
+
+    o.once(function (v) {
+      fired ++
+      t.equal(v, 1)
+    })
+
+    t.equal(fired, 2)
+
+    o.set(2)
+
+    o.set(3)
+
+    t.equal(fired, 3)
+
+    t.end()
+
+  })
+
 }
 
 if(!module.parent) module.exports (require('../'))
-
-
-
-
-
-
-
-
 
 
