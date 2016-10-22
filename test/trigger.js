@@ -144,8 +144,26 @@ module.exports = function (observable) {
 
   })
 
+  tape('once, !immediately, inside trigger', function (t) {
+
+    var o = observable()
+    var fired = 0
+    o.once(function (v) {
+      t.equal(v, 1)
+      fired ++
+      o.once(function (v) {
+        fired ++
+        t.equal(v, 2)
+      }, false)
+    })
+
+    o.set(1)
+    t.equal(fired, 1)
+    o.set(2)
+    t.equal(fired, 2)
+    t.end()
+  })
 }
 
 if(!module.parent) module.exports (require('../'))
-
 
