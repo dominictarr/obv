@@ -1,11 +1,11 @@
 {
-  "name": "ob",
-  "description": "",
+  "name": "obv",
+  "description": "simple and lightweight observer",
   "version": "0.0.0",
-  "homepage": "https://github.com/dominictarr/ob",
+  "homepage": "https://github.com/dominictarr/obv",
   "repository": {
     "type": "git",
-    "url": "git://github.com/dominictarr/ob.git"
+    "url": "git://github.com/dominictarr/obv.git"
   },
   "dependencies": {},
   "devDependencies": {
