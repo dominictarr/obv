@@ -8,7 +8,14 @@ module.exports = function (filter) {
       var listener = listeners[i](value)
       //if we remove a listener, must decrement i also
     }
-    while(oncers.length) oncers.shift()(value)
+    // decrement from length, incase a !immediately
+    // listener is added during a trigger
+    var l = oncers.length
+    var _oncers = oncers
+    oncers = []
+    while(l-- && _value === value) {
+      _oncers.shift()(value)
+    }
   }
 
   function many (ready, immediately) {
@@ -34,6 +41,4 @@ module.exports = function (filter) {
 
   return many
 }
-
-
 
