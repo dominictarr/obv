@@ -35,10 +35,20 @@ module.exports = function (filter) {
   }
 
   many.once = function (once, immediately) {
-    if(value !== null && immediately !== false) once(value)
-    else oncers.push(once)
+    if(value !== null && immediately !== false) {
+      once(value)
+      return function () {}
+    }
+    else {
+      var i = oncers.push(once) - 1
+      return function () {
+        if(oncers[i] !== once)
+          i = oncers.indexOf(once)
+      }
+    }
   }
 
   return many
 }
+
 
