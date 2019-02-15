@@ -57,6 +57,44 @@ module.exports = function (observable) {
 
   })
 
+  tape('remove self from inside listener', function (t) {
+    var o = observable()
+    var value = Math.random(), checked = 0
+
+    o.set(value)
+
+    o(function (_value) {
+      t.equal(_value, value)
+      checked ++
+      this()
+    })
+
+    t.equal(checked, 1)
+    o.set(value)
+    t.equal(checked, 1)
+    t.end()
+  })
+
+  tape('remove self from inside listener, not immediate', function (t) {
+    var o = observable()
+    var value = Math.random(), checked = 0
+
+    o.set(value)
+
+    o(function (_value) {
+      t.equal(_value, value)
+      checked ++
+      this()
+    }, false)
+
+    t.equal(checked, 0)
+    o.set(value)
+    t.equal(checked, 1)
+    o.set(value)
+    t.equal(checked, 1)
+    t.end()
+  })
+
   tape('add listener within trigger', function (t) {
     var o = observable()
 

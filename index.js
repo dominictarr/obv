@@ -19,14 +19,20 @@ module.exports = function (filter) {
   }
 
   function many (ready, immediately) {
-    var i = listeners.push(ready) - 1
-    if(value !== null && immediately !== false) ready(value)
-    return function () { //manually remove...
+    function rm () { //manually remove...
       //fast path, will happen if an earlier listener has not been removed.
-      if(listeners[i] !== ready)
-        i = listeners.indexOf(ready)
+      if(listeners[i] !== boundReady)
+        i = listeners.indexOf(boundReady)
       listeners.splice(i, 1)
     }
+
+    const boundReady = ready.bind(rm)
+
+    var i = listeners.push(boundReady) - 1
+
+    if(value !== null && immediately !== false) boundReady(value)
+
+    return rm
   }
 
   many.set = function (_value) {
