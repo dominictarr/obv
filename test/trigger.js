@@ -58,40 +58,64 @@ module.exports = function (observable) {
   })
 
   tape('remove self from inside listener', function (t) {
-    var o = observable()
-    var value = Math.random(), checked = 0
+    const o = observable()
+    const value = Math.random()
+    let firstCalled = 0
+    let secondCalled = 0
 
     o.set(value)
 
-    o(function (_value) {
+    o(function (_value, rm) {
       t.equal(_value, value)
-      checked ++
-      this()
+      firstCalled += 1
+      rm()
     })
 
-    t.equal(checked, 1)
+    o(function (_value, rm) {
+      t.equal(_value, value)
+      secondCalled += 1
+      rm()
+    })
+
+    t.equal(firstCalled, 1)
+    t.equal(secondCalled, 1)
+
     o.set(value)
-    t.equal(checked, 1)
+
+    t.equal(firstCalled, 1)
+    t.equal(secondCalled, 1)
+
     t.end()
   })
 
   tape('remove self from inside listener, not immediate', function (t) {
-    var o = observable()
-    var value = Math.random(), checked = 0
+    const o = observable()
+    const value = Math.random()
+    let firstCalled = 0
+    let secondCalled = 0
 
     o.set(value)
 
-    o(function (_value) {
+    o(function (_value, rm) {
       t.equal(_value, value)
-      checked ++
-      this()
+      firstCalled += 1
+      rm()
     }, false)
 
-    t.equal(checked, 0)
+    o(function (_value, rm) {
+      t.equal(_value, value)
+      secondCalled += 1
+      rm()
+    })
+
+    t.equal(firstCalled, 0)
+    t.equal(secondCalled, 1)
+
     o.set(value)
-    t.equal(checked, 1)
-    o.set(value)
-    t.equal(checked, 1)
+
+    t.equal(firstCalled, 1)
+    t.equal(secondCalled, 1)
+
     t.end()
   })
 
