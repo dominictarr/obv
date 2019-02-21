@@ -88,6 +88,37 @@ module.exports = function (observable) {
     t.end()
   })
 
+  tape('remove self, keep a second listener', function (t) {
+    const o = observable()
+    const value = Math.random()
+    let firstCalled = 0
+    let secondCalled = 0
+
+    o.set(value)
+
+    o(function (_value, rm) {
+      t.equal(_value, value)
+      firstCalled += 1
+      rm()
+    })
+
+    o(function (_value, rm) {
+      t.equal(_value, value)
+      secondCalled += 1
+    })
+
+    t.equal(firstCalled, 1)
+    t.equal(secondCalled, 1)
+
+    o.set(value)
+
+    t.equal(firstCalled, 1)
+    t.equal(secondCalled, 2)
+
+    t.end()
+  })
+
+
   tape('remove self from inside listener, not immediate', function (t) {
     const o = observable()
     const value = Math.random()
@@ -105,7 +136,7 @@ module.exports = function (observable) {
     o(function (_value, rm) {
       t.equal(_value, value)
       secondCalled += 1
-      rm()
+      //rm()
     })
 
     t.equal(firstCalled, 0)
@@ -118,6 +149,40 @@ module.exports = function (observable) {
 
     t.end()
   })
+
+
+  tape('remove self from inside listener, not immediate, keep second listener', function (t) {
+    const o = observable()
+    const value = Math.random()
+    let firstCalled = 0
+    let secondCalled = 0
+
+    o.set(value)
+
+    //not called immediately, but called from next o.set(value)
+    o(function (_value, rm) {
+      t.equal(_value, value)
+      firstCalled += 1
+      rm()
+    }, false)
+
+    o(function (_value, rm) {
+      t.equal(_value, value)
+      secondCalled += 1
+    })
+
+    //set (fn, false)
+    t.equal(firstCalled, 0)
+    t.equal(secondCalled, 1)
+
+    o.set(value)
+
+    t.equal(firstCalled, 1)
+    t.equal(secondCalled, 2)
+
+    t.end()
+  })
+
 
   tape('add listener within trigger', function (t) {
     var o = observable()
@@ -228,4 +293,7 @@ module.exports = function (observable) {
 }
 
 if(!module.parent) module.exports (require('../'))
+
+
+
 
